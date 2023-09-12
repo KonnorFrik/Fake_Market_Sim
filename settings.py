@@ -1,0 +1,2 @@
+INPUT_PROMT = "~> "
+UNKNOWN_COMMAND_MESSAGE = "Unknown Command"

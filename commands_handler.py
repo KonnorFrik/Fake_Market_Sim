@@ -4,19 +4,22 @@ __all__ = [
 ]
 
 import settings
-from typing import Callable
 
 _name_func_map = dict()
 _name_doc_func = dict()
 
 
 def register(func):
+    """Store functions and their doc_string for call them by name later"""
+
     _name_func_map[func.__name__] = func
     _name_doc_func[func.__name__] = func.__doc__
     return func
 
 
-def handler(raw_command: str, obj_search: Callable):
+def handler(raw_command):
+    """Process user command and call stored functions"""
+
     error_message = ""
 
     command_splitter = raw_command.split()
@@ -24,14 +27,10 @@ def handler(raw_command: str, obj_search: Callable):
     args = command_splitter[1:] if len(command_splitter) > 1 else None
 
     try:
-        obj = obj_search(args)
-        _name_func_map[command](obj or args)
+        _name_func_map[command](*args if args is not None else tuple())
 
     except KeyError:
         error_message = settings.UNKNOWN_COMMAND_MESSAGE
-
-    #except Exception as err:
-        #error_message = f"Unknown error: '{err}'"
 
     return error_message
 
@@ -39,14 +38,11 @@ def handler(raw_command: str, obj_search: Callable):
 @register
 def help(*a, **kw):
     """Show help message"""
+
     print()
+
     for name, doc in _name_doc_func.items():
         print(f"{name} -\t{doc}")
 
     print()
 
-
-if __name__ == "__main__":
-    while True:
-        error_message = handler(input("~> "))
-        print(error_message) if error_message else ...

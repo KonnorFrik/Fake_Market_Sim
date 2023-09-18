@@ -14,6 +14,7 @@ def register(func):
 
     _name_func_map[func.__name__] = func
     _name_doc_func[func.__name__] = func.__doc__
+
     return func
 
 

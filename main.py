@@ -8,8 +8,8 @@ from commands_handler import _name_func_map, handler, register # last in import 
 import settings
 #from trading_pairs import new_pairs
 
-global_vars["user"] = User().load()
-global_vars["market"] = Market().load()
+global_vars[settings.GLOBAL_USER_NAME] = User().load()
+global_vars[settings.GLOBAL_MARKET_NAME] = Market().load()
 
 
 def save_all():
@@ -20,7 +20,7 @@ def save_all():
             if obj.save():
                 saved_count += 1
 
-    print(f"Saved: {saved_count}/{len(global_vars.values())} objects")
+    #print(f"Saved: {saved_count}/{len(global_vars.values())} objects")
 
 
 @register
@@ -32,11 +32,11 @@ def new(choose = None, *a, **kw):
         print("No argument")
         return
 
-    if choose.lower() == "user":
-        global_vars["user"] = User.new()
+    if choose.lower() == settings.GLOBAL_USER_NAME:
+        global_vars[settings.GLOBAL_USER_NAME] = User.new()
 
-    elif choose.lower() == "market":
-        global_vars["market"] = Market.new()
+    elif choose.lower() == settings.GLOBAL_MARKET_NAME:
+        global_vars[settings.GLOBAL_MARKET_NAME] = Market.new()
 
     else:
         print("Unknown argument")
@@ -48,7 +48,7 @@ def quit(*a, code=0, **kw):
 
     print(" Exit? [y/N]")
 
-    if (answ := input(settings.INPUT_PROMT).lower()) == "y" or answ == "yes":
+    if ask_bool():
         save_all()
         print("Bye")
         exit(code)
@@ -68,8 +68,7 @@ def main():
     while True:
         try:
             user_input = input(settings.INPUT_PROMT)
-            message = handler(user_input)
-            print(message) if message else ...
+            handler(user_input)
 
         except KeyboardInterrupt:
             quit(code=1)

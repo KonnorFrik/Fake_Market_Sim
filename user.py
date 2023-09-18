@@ -15,6 +15,15 @@ class User:
         self.pocket = defaultdict(int)
 
 
+    def _clear_pocket(self):
+        to_del = list()
+        for name, val in self.pocket.items():
+            if val <= 0:
+                to_del.append(name)
+
+        for name in to_del:
+            del self.pocket[name]
+
     def writing_off(self, name, price, count):
         self.money -= count * price
         self.pocket[name] += count
@@ -24,20 +33,21 @@ class User:
         self.pocket[name] -= count
         self.money += price * count
 
-        if self.pocket[name] <= 0:
-            del self.pocket[name]
-
+        self._clear_pocket()
 
     def can_buy(self, price, count):
         return (self.money - (price * count)) >= 0
 
 
     def can_sell(self, name, count):
-        return (self.pocket[name] - count) >= 0
-
+        res = (self.pocket[name] - count) >= 0
+        self._clear_pocket()
+        return res
 
     def get_coin_count(self, name):
-        return self.pocket[name]
+        res = self.pocket[name]
+        self._clear_pocket()
+        return res
 
 
     def load(self):

@@ -1,12 +1,17 @@
 from typing import Optional
+from decimal import Decimal
 from global_scope import global_vars
-from commands_handler import register # last in import section
+from commands_handler import register
 import settings
 
 
 def ask_bool():
     res = input(settings.INPUT_PROMT).lower()
     return (res == "y") or (res == "yes")
+
+
+def convert_to_int(obj):
+    return Decimal(obj) if obj.isdigit() else None
 
 
 @register
@@ -32,14 +37,12 @@ def sell(name = None, raw_count = None, *a, **kw):
         print("No arguments for sell")
         return
 
-    if raw_count.isdigit():
-        count = int(raw_count)
+    if not (count := convert_to_int(raw_count)):
+        return
 
-    else:
-        return False
-
-    user = global_vars["user"]
-    market = global_vars["market"]
+    user = global_vars[settings.GLOBAL_USER_NAME]
+    market = global_vars[settings.GLOBAL_MARKET_NAME]
+    name = name.upper()
 
     try:
         price = market.get_price(name)
@@ -48,20 +51,15 @@ def sell(name = None, raw_count = None, *a, **kw):
         print(f"Wrong product name")
         return
 
-    def market_sale(user, market, name, price, count):
+    if user.can_sell(name, count):
         if market.sell(name, count):
             user.refill(name, price, count)
 
         else:
             print("No product in market")
 
-    if user.can_sell(name, count):
-        market_sale(user, market, name, price, count)
-
     else:
-        print(f"Not enough products in pocket.\nSell All? [y/N]")
-        if ask_bool():
-            market_sale(user, market, name, price, count)
+        print(f"Wrong count for sell")
 
 
 @register
@@ -73,14 +71,12 @@ def buy(name = None, raw_count = None, *a, **kw):
         print("No arguments for buy")
         return
 
-    if raw_count.isdigit():
-        count = int(raw_count)
+    if not (count := convert_to_int(raw_count)):
+        return
 
-    else:
-        return False
-
-    user = global_vars["user"]
-    market = global_vars["market"]
+    user = global_vars[settings.GLOBAL_USER_NAME]
+    market = global_vars[settings.GLOBAL_MARKET_NAME]
+    name = name.upper()
 
     try:
         price = market.get_price(name)

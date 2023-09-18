@@ -8,3 +8,5 @@ DEFAULT_USER_START_MONEY = 1_000
 DEFAULT_MARKET_DIR = "data/market/"
 DEFAULT_MARKET_DATA_FILE = "market_data.pckl"
 
+GLOBAL_USER_NAME = "user"
+GLOBAL_MARKET_NAME = "market"

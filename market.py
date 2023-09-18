@@ -57,7 +57,6 @@ class Market:
                 self = pickle.load(file)
 
         except FileNotFoundError:
-            #logger
             print(f"[ERROR] can't load market data from: {self.filepath}, default will be used")
             return Market.new()
 
@@ -82,6 +81,7 @@ class Market:
             res = True
 
         return res
+
 
     def __repr__(self):
         buf = list()

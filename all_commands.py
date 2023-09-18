@@ -29,6 +29,14 @@ def info(name = None, *a, **kw):
 
 
 @register
+def portfolio(*a, **kw):
+    """Show sum of all items in your pocket"""
+    user = global_vars[settings.GLOBAL_USER_NAME]
+
+    cost = user.portfolio_cost()
+    print(f"Your portfolio value: '{cost}'")
+
+@register
 def sell(name = None, raw_count = None, *a, **kw):
     """Sell goods from user
         Usage: 'sell <product_name> <count>'"""

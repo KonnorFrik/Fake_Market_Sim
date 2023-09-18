@@ -42,8 +42,20 @@ def help(*a, **kw):
 
     print()
 
+    name_fmt = "{name: <10} -"
+    doc_fmt = "{doc: <30}"
+    usage_fmt = "{usg: <30}"
+
     for name, doc in _name_doc_func.items():
-        print(f"{name} -\t{doc}")
+        name_res = name_fmt.format(name=name)
+        doc_splited = doc.split("\n")
+        doc_res = doc_fmt.format(doc=doc_splited[0])
+        usage_res = ""
+
+        if len(doc_splited) >= 2:
+            usage_res = usage_fmt.format(usg=doc_splited[1])
+
+        print(name_res + doc_res + usage_res)
 
     print()
 

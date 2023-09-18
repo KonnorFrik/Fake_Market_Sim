@@ -1,6 +1,7 @@
 import pickle
 from collections import defaultdict
 from decimal import Decimal
+from global_scope import global_vars
 
 import settings
 
@@ -92,6 +93,16 @@ class User:
 
         return money + "\n" + res
 
+
+    def portfolio_cost(self):
+        res = 0
+        market = global_vars[settings.GLOBAL_MARKET_NAME]
+
+        for name, count in self.pocket.items():
+            price = market.get_price(name)
+            res += price * count
+
+        return res
 
     @staticmethod
     def new():

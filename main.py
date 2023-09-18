@@ -82,6 +82,6 @@ if __name__ == "__main__":
         save_all()
         exit(2)
 
-    except Exception:
-        save_all()
-        print("Found Unknown Error\nExit")
+    #except Exception:
+        #save_all()
+        #print("Found Unknown Error\nExit")

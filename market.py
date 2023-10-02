@@ -10,7 +10,6 @@ class Market:
     filepath = settings.DEFAULT_MARKET_DIR + settings.DEFAULT_MARKET_DATA_FILE
 
     def __init__(self, trade_pairs = None, count_pairs = None):
-
         self.trade_pairs = dict(trade_pairs) if trade_pairs else dict()
         self.count_pairs = dict(count_pairs) if count_pairs else dict()
 
@@ -44,34 +43,43 @@ class Market:
 
 
     def get_price(self, name):
+        """ Get price of one product """
         return self.trade_pairs[name]
 
 
     def get_count(self, name):
+        """ Get products count by name """
         return self.count_pairs[name]
 
 
-    def load(self):
+    def load(self, session_path):
+        """ Try load from session file
+            If fail - create new User """
+        filepath = session_path + settings.DEFAULT_MARKET_DATA_FILE
+
         try:
-            with open(self.filepath, "rb") as file:
+            with open(filepath, "rb") as file:
                 self = pickle.load(file)
 
         except FileNotFoundError:
-            print(f"[ERROR] can't load market data from: {self.filepath}, default will be used")
+            print(f"[ERROR] can't load market data from: {filepath}, default will be used")
             return Market.new()
 
         except EOFError:
-            print(f"[ERROR] file '{self.filepath}' may be corrupted, default data will be used")
+            print(f"[ERROR] file '{filepath}' may be corrupted, default data will be used")
             return Market.new()
 
         return self
 
 
-    def save(self) -> bool:
+    def save(self, session_path) -> bool:
+        """ Try save to self to session folder
+            If can't open file return False """
+        filepath = session_path + settings.DEFAULT_MARKET_DATA_FILE
         res = False
 
         try:
-            with open(self.filepath, "wb") as file:
+            with open(filepath, "wb") as file:
                 pickle.dump(self, file)
 
         except FileNotFoundError:

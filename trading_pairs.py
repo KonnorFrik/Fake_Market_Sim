@@ -5,6 +5,7 @@ from string import ascii_uppercase
 
 
 def new_product_name():
+    """ Random name for new product """
     return "".join((choice(ascii_uppercase) for _ in range(4)))
 
 
@@ -17,6 +18,7 @@ def new_count(start=10, end=10_000):
 
 
 def new_pairs() -> tuple:
+    """ Random pairs with name, count and price """
     assets = list()
     counts = list()
 

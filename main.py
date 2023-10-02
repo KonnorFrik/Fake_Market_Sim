@@ -1,15 +1,33 @@
+import os
 from typing import Any
 
 from global_scope import global_vars
 from all_commands import *
 from user import User
 from market import Market
+from session import Session
 from commands_handler import _name_func_map, handler, register # last in import section
 import settings
-#from trading_pairs import new_pairs
 
-global_vars[settings.GLOBAL_USER_NAME] = User().load()
-global_vars[settings.GLOBAL_MARKET_NAME] = Market().load()
+global_vars[settings.GLOBAL_SESSION_NAME] = Session()
+global_vars[settings.GLOBAL_USER_NAME] = User().load(settings.DEFAULT_SESSION_DIR)
+global_vars[settings.GLOBAL_MARKET_NAME] = Market().load(settings.DEFAULT_SESSION_DIR)
+
+__abs_path = "/".join(os.path.abspath(__file__).split("/")[:-1])
+
+def check_dir(_dir):
+    #print("check:", _dir)
+    if not os.path.exists(__abs_path + "/" + _dir):
+        #print("create:", __abs_path + "/" + _dir)
+        os.mkdir(__abs_path + "/" + _dir)
+
+
+def check_dirs():
+    check_dirs(settings.DEFAULT_DATA_DIR)
+    check_dirs(settings.SESSION_DIR)
+    check_dirs(settings.DEFAULT_SESSION_DIR)
+    check_dirs(settings.DEFAULT_SESSION_DIR + settings.DEFAULT_USER_DIR)
+    check_dirs(settings.DEFAULT_SESSION_DIR + settings.DEFAULT_MARKET_DIR)
 
 
 def save_all():
@@ -17,7 +35,7 @@ def save_all():
 
     for obj in global_vars.values():
         if "save" in dir(obj):
-            if obj.save():
+            if obj.save(settings.DEFAULT_SESSION_DIR):
                 saved_count += 1
 
     #print(f"Saved: {saved_count}/{len(global_vars.values())} objects")
@@ -76,6 +94,7 @@ def main():
 
 if __name__ == "__main__":
     try:
+        check_dirs()
         main()
 
     except KeyboardInterrupt:

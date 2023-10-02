@@ -7,9 +7,7 @@ import settings
 
 
 class User:
-    """User object for comunicate with market"""
-
-    filepath = settings.DEFAULT_USER_DIR + settings.DEFAULT_USER_DATA_FILE
+    """ User object for comunicate with market """
 
     def __init__(self):
         self.money = Decimal(settings.DEFAULT_USER_START_MONEY)
@@ -25,6 +23,7 @@ class User:
         for name in to_del:
             del self.pocket[name]
 
+
     def writing_off(self, name, price, count):
         self.money -= count * price
         self.pocket[name] += count
@@ -36,6 +35,7 @@ class User:
 
         self._clear_pocket()
 
+
     def can_buy(self, price, count):
         return (self.money - (price * count)) >= 0
 
@@ -45,34 +45,42 @@ class User:
         self._clear_pocket()
         return res
 
+
     def get_coin_count(self, name):
         res = self.pocket[name]
         self._clear_pocket()
         return res
 
 
-    def load(self):
+    def load(self, session_path):
+        """ Try load from session file
+            If fail - create new User """
+        filepath = session_path + settings.DEFAULT_USER_DATA_FILE
+
         try:
-            with open(self.filepath, "rb") as file:
+            with open(filepath, "rb") as file:
                 self = pickle.load(file)
 
         except FileNotFoundError:
             #logger
-            print(f"[ERROR] can't load user data from: {self.filepath}, default will be used")
+            print(f"[ERROR] can't load user data from: {filepath}, default will be used")
             return User.new()
 
         except EOFError:
-            print(f"[ERROR] file '{self.filepath}' may be corrupted, default data will be used")
+            print(f"[ERROR] file '{filepath}' may be corrupted, default data will be used")
             return User.new()
 
         return self
 
 
-    def save(self) -> bool:
+    def save(self, session_path) -> bool:
+        """ Try save to self to session folder
+            If can't open file return False """
+        filepath = session_path + settings.DEFAULT_USER_DATA_FILE
         res = False
 
         try:
-            with open(self.filepath, "wb") as file:
+            with open(filepath, "wb") as file:
                 pickle.dump(self, file)
 
         except FileNotFoundError:
@@ -95,6 +103,7 @@ class User:
 
 
     def portfolio_cost(self):
+        """ Sum of all things in pocket """
         res = 0
         market = global_vars[settings.GLOBAL_MARKET_NAME]
 
@@ -103,6 +112,7 @@ class User:
             res += price * count
 
         return res
+
 
     @staticmethod
     def new():

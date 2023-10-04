@@ -30,8 +30,13 @@ def get_session_token():
 
 #Command for switch, create new
 class Session:
-    def __init__(self, force = False):
-        self.session_token = get_session_token() if not force else word_gen()
+    def __init__(self, force = False, _token = ""):
+        if not _token:
+            self.session_token = get_session_token() if not force else word_gen()
+
+        else:
+            self.session_token = _token
+
         update_names_by_token(self.token)
 
 
@@ -42,3 +47,9 @@ class Session:
 
     def save(self, *a, **kw):
         return False
+
+
+    @classmethod
+    def open(cls, name):
+        return cls(_token=name)
+

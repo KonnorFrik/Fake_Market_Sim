@@ -1,4 +1,5 @@
 INPUT_PROMT = "~> "
+SPECIAL_PROMT = ":> "
 UNKNOWN_COMMAND_MESSAGE = "Unknown Command"
 
 SESSION_TOKEN = "{}/"

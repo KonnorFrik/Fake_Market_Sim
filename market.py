@@ -62,11 +62,13 @@ class Market:
                 self = pickle.load(file)
 
         except FileNotFoundError:
-            print(f"[ERROR] can't load market data from: {filepath}, default will be used")
+            #print(f"[ERROR] can't load market data from: {filepath}, default will be used")
+            print(f"Can't load market. Create new")
             return Market.new()
 
         except EOFError:
-            print(f"[ERROR] file '{filepath}' may be corrupted, default data will be used")
+            #print(f"[ERROR] file '{filepath}' may be corrupted, default data will be used")
+            print(f"Can't load market. Create new")
             return Market.new()
 
         return self

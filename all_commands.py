@@ -1,8 +1,33 @@
-from typing import Optional
+__all__ = [
+    "setup",
+    "ask_bool",
+    "check_dirs",
+    "save_all",
+    "_set_abs_path",
+]
+
+
+import os
 from decimal import Decimal
+
+import settings
+from user import User
+from market import Market
+from session import Session
 from global_scope import global_vars
 from commands_handler import register
-import settings
+
+_abs_path = ""
+
+def _set_abs_path(path):
+    global _abs_path
+    _abs_path = path
+
+
+def setup(session = None, user = None, market = None):
+    global_vars[settings.GLOBAL_SESSION_NAME] = Session() if not session else session
+    global_vars[settings.GLOBAL_USER_NAME] = User().load(settings.DEFAULT_SESSION_DIR) if not user else user
+    global_vars[settings.GLOBAL_MARKET_NAME] = Market().load(settings.DEFAULT_SESSION_DIR) if not market else market
 
 
 def ask_bool():
@@ -12,6 +37,45 @@ def ask_bool():
 
 def convert_to_int(obj):
     return Decimal(obj) if obj.isdigit() else None
+
+
+def check_dir(_dir):
+    #print("check:", _dir)
+    if not os.path.exists(_abs_path + "/" + _dir):
+        #print("create:", _abs_path + "/" + _dir)
+        os.mkdir(_abs_path + "/" + _dir)
+
+
+def check_dirs():
+    check_dir(settings.DEFAULT_DATA_DIR)
+    check_dir(settings.SESSION_DIR)
+    check_dir(settings.DEFAULT_SESSION_DIR)
+    check_dir(settings.DEFAULT_SESSION_DIR + settings.DEFAULT_USER_DIR)
+    check_dir(settings.DEFAULT_SESSION_DIR + settings.DEFAULT_MARKET_DIR)
+
+
+def save_all():
+    saved_count = 0
+
+    for obj in global_vars.values():
+        if "save" in dir(obj):
+            if obj.save(settings.DEFAULT_SESSION_DIR):
+                saved_count += 1
+
+    #print(f"Saved: {saved_count}/{len(global_vars.values())} objects")
+
+
+@register
+def new(*a, **kw):
+    """Create a new session
+        Usage: new"""
+
+    save_all()
+    new_session = Session(force=True)
+    check_dirs()
+    setup(session=new_session,
+          user=User().load(settings.DEFAULT_SESSION_DIR),
+          market=Market().load(settings.DEFAULT_SESSION_DIR))
 
 
 @register
@@ -25,7 +89,49 @@ def info(name = None, *a, **kw):
         print(obj)
 
     else:
-        print("No argument for display")
+        session_token = global_vars[settings.GLOBAL_SESSION_NAME].token
+        user_name = global_vars[settings.GLOBAL_USER_NAME].name
+
+        print()
+        print(f"Session name: {session_token}")
+        print(f"User name: {user_name}")
+        print()
+
+
+@register
+def switch(name = None, *a, **kw):
+    """Switch between sessions
+        Usage: switch [name]"""
+    sessions = {ind: name for ind, name in enumerate(os.listdir(settings.SESSION_DIR), 1)}
+    print("Switch To:")
+    print("0. Abort")
+
+    for ind, name in sessions.items():
+        print(f"\t{ind}: {name}")
+
+    try:
+        answer = int(input(settings.SPECIAL_PROMT))
+
+    except ValueError:
+        print("Wrong input")
+        print("Abort Switching")
+        return
+
+    if answer <= 0:
+        return
+
+    if answer > max(sessions):
+        print("Wrong input")
+        print("Abort Switching")
+        return
+
+    save_all()
+    print("Opening:" , sessions[answer])
+    new_session = Session.open(sessions[answer])
+    setup(session=new_session,
+          user=User().load(settings.DEFAULT_SESSION_DIR),
+          market=Market().load(settings.DEFAULT_SESSION_DIR))
+    print(f"Username: {global_vars[settings.GLOBAL_USER_NAME].name}\n")
 
 
 @register
@@ -35,6 +141,7 @@ def portfolio(*a, **kw):
 
     cost = user.portfolio_cost()
     print(f"Your portfolio value: '{cost}'")
+
 
 @register
 def sell(name = None, raw_count = None, *a, **kw):

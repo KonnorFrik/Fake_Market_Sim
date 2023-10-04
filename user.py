@@ -9,9 +9,15 @@ import settings
 class User:
     """ User object for comunicate with market """
 
-    def __init__(self):
-        self.money = Decimal(settings.DEFAULT_USER_START_MONEY)
+    def __init__(self, name = None, start_money = None):
+        self.money = Decimal(start_money) if start_money else Decimal(settings.DEFAULT_USER_START_MONEY)
         self.pocket = defaultdict(int)
+        self._name = name
+
+
+    @property
+    def name(self):
+        return self._name
 
 
     def _clear_pocket(self):
@@ -63,11 +69,13 @@ class User:
 
         except FileNotFoundError:
             #logger
-            print(f"[ERROR] can't load user data from: {filepath}, default will be used")
+            #print(f"[ERROR] can't load user data from: {filepath}, default will be used")
+            print(f"Can't load user. Create new")
             return User.new()
 
         except EOFError:
-            print(f"[ERROR] file '{filepath}' may be corrupted, default data will be used")
+            #print(f"[ERROR] file '{filepath}' may be corrupted, default data will be used")
+            print(f"Can't load user. Create new")
             return User.new()
 
         return self
@@ -116,4 +124,9 @@ class User:
 
     @staticmethod
     def new():
-        return User()
+        print("Enter a User name: ")
+        name = input(settings.SPECIAL_PROMT)
+
+        print("Enter a User start money")
+        start_money = input(settings.SPECIAL_PROMT)
+        return User(name=name, start_money=start_money)

@@ -31,9 +31,9 @@ def handler(raw_command):
         _name_func_map[command](*args if args is not None else tuple())
 
     except KeyError:
-        error_message = settings.UNKNOWN_COMMAND_MESSAGE
+        return settings.UNKNOWN_COMMAND_MESSAGE
 
-    return error_message
+    return True
 
 
 @register

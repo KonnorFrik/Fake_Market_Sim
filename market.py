@@ -7,7 +7,7 @@ class Market:
     """Store trading pairs
         Provide API for trade them"""
 
-    filepath = settings.DEFAULT_MARKET_DIR + settings.DEFAULT_MARKET_DATA_FILE
+    #filepath = settings.DEFAULT_MARKET_DIR + settings.DEFAULT_MARKET_DATA_FILE
 
     def __init__(self, trade_pairs = None, count_pairs = None):
         self.trade_pairs = dict(trade_pairs) if trade_pairs else dict()
@@ -41,6 +41,12 @@ class Market:
         self.count_pairs[name] += count
         return True
 
+
+    def _get_pairs(self):
+        return self.trade_pairs
+
+    def _set_pairs(self):
+        ...
 
     def get_price(self, name):
         """ Get price of one product """

@@ -22,6 +22,8 @@ def quit(*a, code=0, **kw):
         print("Bye")
         exit(code)
 
+    return False
+
 
 #def get_obj(args):
     #"""Return object by his name for use as command argument"""
@@ -34,13 +36,25 @@ def quit(*a, code=0, **kw):
 
 
 def main():
+    keyboard_interrupts_count = 0
+
     while True:
         try:
             user_input = input(settings.INPUT_PROMT)
-            handler(user_input)
+            msg = handler(user_input)
+
+            if isinstance(msg, str):
+                print(msg)
+
+            keyboard_interrupts_count = 0
 
         except KeyboardInterrupt:
-            quit(code=1)
+            keyboard_interrupts_count += 1
+            print()
+
+            if keyboard_interrupts_count >= 2:
+                if not quit(code=1):
+                    keyboard_interrupts_count = 0
 
 
 if __name__ == "__main__":
@@ -51,6 +65,13 @@ if __name__ == "__main__":
         _set_abs_path(_abs_path)
         check_dirs()
         print(f"Username: {global_vars[settings.GLOBAL_USER_NAME].name}\n")
+
+        market_obj = global_vars[settings.GLOBAL_MARKET_NAME]
+
+        print(market_obj.trade_pairs)
+        print()
+        print(market_obj.count_pairs)
+
         main()
 
     except KeyboardInterrupt:
@@ -58,6 +79,7 @@ if __name__ == "__main__":
         exit(2)
 
     except EOFError:
+        print()
         save_all()
         exit(2)
 

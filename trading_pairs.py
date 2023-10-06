@@ -9,7 +9,7 @@ def new_product_name():
     return "".join((choice(ascii_uppercase) for _ in range(4)))
 
 
-def new_price(start=10, end=1_000_000):
+def new_price(start=10, end=10_000):
     return Decimal(randint(start, end))
 
 

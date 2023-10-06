@@ -8,6 +8,8 @@ __all__ = [
 
 
 import os
+import math
+import random
 from decimal import Decimal
 
 import settings
@@ -22,6 +24,18 @@ _abs_path = ""
 def _set_abs_path(path):
     global _abs_path
     _abs_path = path
+
+
+def how_many_perc(num1, num2):
+    """ What percentage is 'num1' of 'num2' """
+    koef = num2 / num1
+    return 100 / koef
+
+
+def perc_from(perc, num):
+    """ What number corresponds to 'perc' percent of the 'num' """
+    koef = num / 100
+    return perc * koef
 
 
 def setup(session = None, user = None, market = None):
@@ -63,6 +77,55 @@ def save_all():
                 saved_count += 1
 
     #print(f"Saved: {saved_count}/{len(global_vars.values())} objects")
+
+
+@register
+def wait(days = "1", *a, **kw):
+    """Skip 'days' for change price
+        Usage: wait <n>"""
+
+    try:
+        days = int(days)
+
+    except ValueError:
+        print("Wrong argument")
+        return
+
+    market_obj = global_vars[settings.GLOBAL_MARKET_NAME]
+
+    for name, price in market_obj.trade_pairs.items():
+        min_lim = 5
+        days_passed = (random.randint(-1, 1) for _ in range(days))
+
+        one_perc = max(perc_from(1, price), 1)
+        half_price = max(perc_from(25, price), 1)
+        price_changes = (random.choice((one_perc, half_price)) for _ in range(days))
+        result_change = max(sum((mod * price for mod, price in zip(days_passed, price_changes))), 1)
+        modifier = random.randint(-1, 1)
+        result_change *= (modifier)
+
+        print(name, "change to:", result_change)
+        print("mod:", modifier)
+        print("Limit:", min_lim)
+        print("Before:", market_obj.trade_pairs[name])
+
+        product_price = market_obj.trade_pairs[name]
+
+        if (product_price + result_change) < min_lim:
+            result_change = result_change * -1 if result_change < 0 else result_change
+
+        product_price += result_change
+        product_price = round(product_price, 8)
+
+        if int(product_price) <= 0:
+            product_price = Decimal(0)
+
+        market_obj.trade_pairs[name] = product_price
+
+        print("After:", product_price)
+        print("type:", type(product_price))
+        print()
+
 
 
 @register

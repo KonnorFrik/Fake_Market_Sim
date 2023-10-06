@@ -65,13 +65,6 @@ if __name__ == "__main__":
         _set_abs_path(_abs_path)
         check_dirs()
         print(f"Username: {global_vars[settings.GLOBAL_USER_NAME].name}\n")
-
-        market_obj = global_vars[settings.GLOBAL_MARKET_NAME]
-
-        print(market_obj.trade_pairs)
-        print()
-        print(market_obj.count_pairs)
-
         main()
 
     except KeyboardInterrupt:

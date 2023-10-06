@@ -42,12 +42,6 @@ class Market:
         return True
 
 
-    def _get_pairs(self):
-        return self.trade_pairs
-
-    def _set_pairs(self):
-        ...
-
     def get_price(self, name):
         """ Get price of one product """
         return self.trade_pairs[name]

@@ -80,6 +80,61 @@ def save_all():
 
 
 @register
+def follow(name = "", *a, **kw):
+    """Follow your favorite products
+        Usage: follow <name>"""
+    name = name.upper()
+
+    if not name:
+        print("No argument")
+        return
+
+    user = global_vars[settings.GLOBAL_USER_NAME]
+
+    try:
+        user.follow(name)
+
+    except Exception as e:
+        print(*e.args)
+
+
+@register
+def unfollow(name = "", *a, **kw):
+    """Unfollow products
+        Usage: unfollow <name>"""
+    name = name.upper()
+
+    if not name:
+        print("No argument")
+        return
+
+    user = global_vars[settings.GLOBAL_USER_NAME]
+
+    try:
+        user.unfollow(name)
+
+    except Exception as e:
+        print(e.args)
+
+
+@register
+def followed(*a, **kw):
+    """Show your favorite products"""
+
+    market = global_vars[settings.GLOBAL_MARKET_NAME]
+    user = global_vars[settings.GLOBAL_USER_NAME]
+
+
+    print("Name  |  Price")
+    print("--------------")
+    for name in user.followed:
+        price = market.get_price(name)
+        print(f"{name}  |  {price}")
+
+    print()
+
+
+@register
 def wait(days = "1", *a, **kw):
     """Skip 'days' for change price
         Usage: wait <n>"""
@@ -89,6 +144,10 @@ def wait(days = "1", *a, **kw):
 
     except ValueError:
         print("Wrong argument")
+        return
+
+    if days < 0:
+        print("Wait time can't be less then 0")
         return
 
     market_obj = global_vars[settings.GLOBAL_MARKET_NAME]
@@ -104,15 +163,13 @@ def wait(days = "1", *a, **kw):
         modifier = random.randint(-1, 1)
         result_change *= (modifier)
 
-        print(name, "change to:", result_change)
-        print("mod:", modifier)
-        print("Limit:", min_lim)
-        print("Before:", market_obj.trade_pairs[name])
-
         product_price = market_obj.trade_pairs[name]
 
         if (product_price + result_change) < min_lim:
             result_change = result_change * -1 if result_change < 0 else result_change
+
+        if result_change > (product_price * 2):
+            result_change = product_price // 2
 
         product_price += result_change
         product_price = round(product_price, 8)
@@ -122,10 +179,9 @@ def wait(days = "1", *a, **kw):
 
         market_obj.trade_pairs[name] = product_price
 
-        print("After:", product_price)
-        print("type:", type(product_price))
-        print()
-
+    print()
+    print("Followed products:")
+    followed()
 
 
 @register

@@ -14,6 +14,28 @@ class User:
         self.pocket = defaultdict(int)
         self._name = name
 
+        self.following = list()
+
+
+    @property
+    def followed(self):
+        for name in self.following:
+            yield name
+
+
+    def follow(self, name):
+        if name not in global_vars[settings.GLOBAL_MARKET_NAME].trade_pairs:
+            raise Exception(f"Name: '{name}' not in market")
+
+        self.following.append(name)
+
+
+    def unfollow(self, name):
+        if name not in self.following:
+            raise Exception(f"Name: '{name}' not in following")
+
+        self.following.pop(self.following.index(name))
+
 
     @property
     def name(self):
